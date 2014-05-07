@@ -1,5 +1,9 @@
 import web
 from adder import PAdder
+from web.wsgiserver import CherryPyWSGIServer
+
+CherryPyWSGIServer.ssl_certificate = "/etc/ssl/certs/server.crt"
+CherryPyWSGIServer.ssl_private_key = "/etc/ssl/certs/server.key"
         
 urls = (
     '/(.*)', 'hello'

@@ -1,5 +1,10 @@
 Cython==0.20.1
 argparse==1.2.1
+cffi==0.8.2
+cryptography==0.4
 ipython==2.0.0
+pyOpenSSL==0.14
+pycparser==2.10
+six==1.6.1
 web.py==0.37
 wsgiref==0.1.2
