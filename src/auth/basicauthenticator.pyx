@@ -20,50 +20,22 @@
  # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,                                                           
  # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE                                                           
  # SOFTWARE.                                                                                                                               
- ##
-set(CTEST_CUSTOM_WARNING_EXCEPTION ${CTEST_CUSTOM_WARNING_EXCEPTION}
-  # http://public.kitware.com/Bug/view.php?id=10179
-  "ld: warning: duplicate dylib")
-include(CTest)
+ ##/
 
-enable_testing()
-add_definitions(-DBOOST_TEST_DYN_LINK) # generates main() for unit tests
+from libcpp.string cimport string
+from libcpp cimport bool
+cdef extern from "auth/BasicAuthenticator.cpp" namespace "auth":
+    cdef cppclass BasicAuthenticator: 
+        BasicAuthenticator()
+        bool authenticate(string key, string password)
 
-if(NOT WIN32) # tests want to be with DLLs on Windows - no rpath
-  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
-endif()
+cdef class PBasicAuthenticator:
+    cdef BasicAuthenticator * ptr
+    def __cinit__(self):
+        self.ptr = new BasicAuthenticator()
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}) ### for tests headers ###
-include_directories(${CMAKE_SOURCE_DIR}/src/)
-include_directories(${CMAKE_BINARY_DIR}) ### for config.h ###
+    def __dealloc__(self):
+        del self.ptr
 
-# Libraries to link the tests executables with
-set(TESTS_LIBRARIES
-  ${Boost_LIBRARIES}
-  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-  Adder
-)
-
-# Create all the tests
-set(TEST_FILES AdderTests.cpp )
-set(ALL_TESTS)
-foreach(FILE ${TEST_FILES})
-  string(REGEX REPLACE ".cpp" "" NAME ${FILE})
-  string(REGEX REPLACE "[./]" "_" NAME ${NAME})
-  source_group(\\ FILES ${FILE})
-  add_executable(${NAME} ${FILE})
-  set_target_properties(${NAME} PROPERTIES FOLDER "Tests")
-
-  target_link_libraries(${NAME} ${TESTS_LIBRARIES})
-
-  get_target_property(EXECUTABLE ${NAME} LOCATION)
-  STRING(REGEX REPLACE "\\$\\(.*\\)" "\${CTEST_CONFIGURATION_TYPE}"
-         EXECUTABLE "${EXECUTABLE}")
-
-  add_test(${NAME} ${EXECUTABLE})
-  list(APPEND ALL_TESTS ${NAME})
-endforeach()
-
-# workaround bug that tests won't get built
-add_custom_target(tests COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS ${ALL_TESTS})
-set_target_properties(tests PROPERTIES FOLDER "Tests")
+    cpdef bool authenticate(self, string key, string value):
+        return self.ptr.authenticate(key, value)
