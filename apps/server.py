@@ -1,28 +1,36 @@
 import web
-from adder import PAdder
-from basicauthenticator import PBasicAuthenticator
+from service import adder, basicauthenticator
 from web.wsgiserver import CherryPyWSGIServer
 
+# Configure the location of the SSL certificates
 CherryPyWSGIServer.ssl_certificate = "/etc/ssl/certs/server.crt"
 CherryPyWSGIServer.ssl_private_key = "/etc/ssl/certs/server.key"
         
+# Configure the URL to handler mappings
 urls = (
-    '/(.*)', 'hello'
+    '/addkey/(.*)', 'AddKeyHandler'
 )
 
+# Authenticator processor method
 def handleAuth(handle):
-    authenticator = PBasicAuthenticator()
+    authenticator = basicauthenticator()
     authenticator.authenticate("","")
     return handle()
 
+# Add key python handler wrapper
+class AddKeyHandler:
+    def PUT(self, key_id):
+        print key_id
+        return 200
 
-
+# This needs to be removed
 class hello:
     def __init__(self):
-        self.adder = PAdder()
+        self.adder = adder()
     def POST(self, name):
         return self.adder.add(web.data())
 
+# Wire everything together and launch the server
 if __name__ == "__main__":
     app = web.application(urls, globals())
     app.add_processor(handleAuth)

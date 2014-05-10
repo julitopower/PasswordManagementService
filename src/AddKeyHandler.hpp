@@ -22,15 +22,15 @@
  * SOFTWARE.                                                                                                                               
  **/
 
-#ifndef ADDER_H
-#define ADDER_H
+#ifndef ADD_KEY_HANDLDER
+#define ADD_KEY_HANDLDER
 
 #include <string>
 
-class Adder {
+class AddKeyHandler {
 public:
-  Adder();
-  int add(const std::string & json) const;
+  bool handle(const std::string &  key, const std::string & jsonValue);
+
 };
 
-#endif //ADDER_H
+#endif // ADD_KEY_HANDLDER

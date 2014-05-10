@@ -21,15 +21,46 @@
  # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE                                                           
  # SOFTWARE.                                                                                                                               
  ##/
-
 from libcpp.string cimport string
 from libcpp cimport bool
+
+cdef extern from "Adder.hpp":
+    cdef cppclass Adder:
+        Adder()
+        int add(string json)
+
+cdef class adder:
+    cdef Adder* ptr
+    def __cinit__(self):
+        self.ptr = new Adder()
+
+    def __dealloc__(self):
+        del self.ptr
+
+    cpdef int add(self, string json):
+        return self.ptr.add(json)
+
+cdef extern from "AddKeyHandler.hpp":
+    cdef cppclass AddKeyHandler:
+        bool handle(string key, string jsonValue)
+
+cdef class addkeyhandler:
+    cdef AddKeyHandler * ptr
+    def __cinit__(self):
+        self.ptr = new AddKeyHandler()
+
+    def __dealloc__(self):
+        del self.ptr
+
+    cpdef bool handle(self, string key, string jsonValue):
+        return self.ptr.handle(key, jsonValue)
+
 cdef extern from "auth/BasicAuthenticator.cpp" namespace "auth":
     cdef cppclass BasicAuthenticator: 
         BasicAuthenticator()
         bool authenticate(string key, string password)
 
-cdef class PBasicAuthenticator:
+cdef class basicauthenticator:
     cdef BasicAuthenticator * ptr
     def __cinit__(self):
         self.ptr = new BasicAuthenticator()

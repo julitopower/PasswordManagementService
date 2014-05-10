@@ -23,28 +23,25 @@
  ##
 ADD_SUBDIRECTORY(auth)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
-SET(src_adder Adder.cpp)
+SET(src Adder.cpp AddKeyHandler.cpp)
 SET(src_auth auth/BasicAuthenticator.cpp)
 
 # Generate Static Libraries for the C++ code
-ADD_LIBRARY(Adder STATIC ${src_adder} ${src_auth})
+ADD_LIBRARY(PasswordService STATIC ${src} ${src_auth})
 
 
 #Wire the Cython magic here
 # If the pyx file is a C++ file, we should specify that here.
 SET_SOURCE_FILES_PROPERTIES(
-  ${STDOUT_WRITER_SOURCE_DIR}/src/adder.pyx
-  ${STDOUT_WRITER_SOURCE_DIR}/src/auth/basicauthenticator.pyx
+  ${STDOUT_WRITER_SOURCE_DIR}/src/service.pyx
   PROPERTIES CYTHON_IS_CXX TRUE )
 
 # Multi-file cython modules do not appear to be working at the moment.
-CYTHON_ADD_MODULE( adder adder.pyx)
-target_link_libraries( adder  Adder)
+CYTHON_ADD_MODULE( service service.pyx )
+target_link_libraries( service PasswordService )
 
-CYTHON_ADD_MODULE( basicauthenticator auth/basicauthenticator.pyx)
-target_link_libraries( basicauthenticator  Adder)
 
 # Finally install the Cython modules and the server launching module
 INSTALL(FILES setup.py DESTINATION ${CMAKE_BINARY_DIR}/python/)
-INSTALL(TARGETS adder basicauthenticator LIBRARY DESTINATION ${CMAKE_BINARY_DIR}/python)
+INSTALL(TARGETS service LIBRARY DESTINATION ${CMAKE_BINARY_DIR}/python)
 INSTALL(CODE "execute_process(COMMAND python ${CMAKE_BINARY_DIR}/python/setup.py install -f WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/python/)")

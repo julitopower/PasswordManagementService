@@ -41,11 +41,11 @@ include_directories(${CMAKE_BINARY_DIR}) ### for config.h ###
 set(TESTS_LIBRARIES
   ${Boost_LIBRARIES}
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-  Adder
+  PasswordService
 )
 
 # Create all the tests
-set(TEST_FILES AdderTests.cpp )
+set(TEST_FILES AdderTests.cpp BasicAuthenticatorTests.cpp)
 set(ALL_TESTS)
 foreach(FILE ${TEST_FILES})
   string(REGEX REPLACE ".cpp" "" NAME ${FILE})
