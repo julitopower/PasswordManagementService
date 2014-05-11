@@ -22,17 +22,19 @@
  * SOFTWARE.                                                                                                                               
  **/
 
-#include "AddKeyHandler.hpp"
-#include <iostream>
+#ifndef STORAGE_H
+#define STORAGE_H
 
-AddKeyHandler::AddKeyHandler(Storage * const storage) : _storage(storage) {}
+#include <string>
+#include <list>
 
-bool AddKeyHandler::handle(const std::string &  key, const std::string & jsonValue) {
-  std::cout << "Key: " << key << " Value: " << jsonValue << std::endl ;
-  _storage->put(key, jsonValue);
-  return true;
-}
+class Storage {
+public:
+  virtual void put(const std::string & key, const std::string & value) = 0;
+  virtual const std::string & get(const std::string & key) = 0;
+  virtual std::list<std::string> searchKeys(const std::string &  pattern) = 0; 
+  virtual ~Storage() {};
+};
 
-const std::string & AddKeyHandler::get(const std::string & key) {
-  return _storage->get(key);
-}
+
+#endif // STORAGE_H

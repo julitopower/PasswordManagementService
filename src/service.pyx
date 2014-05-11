@@ -23,12 +23,16 @@
  ##/
 from libcpp.string cimport string
 from libcpp cimport bool
+from cython.operator cimport dereference as deref
 
+# Import CPP class definition. Declare methods needed in this
+# particular file
 cdef extern from "Adder.hpp":
     cdef cppclass Adder:
         Adder()
         int add(string json)
 
+# Python class that we use to wrap the CPP one.
 cdef class adder:
     cdef Adder* ptr
     def __cinit__(self):
@@ -40,20 +44,43 @@ cdef class adder:
     cpdef int add(self, string json):
         return self.ptr.add(json)
 
+# Trying to implement CPP polymorphism using Cython
+cdef extern from "store/Storage.hpp":
+    cdef cppclass Storage:
+        pass
+cdef class storage:
+    cdef Storage * ptr
+
+cdef extern from "store/MapStorage.hpp":
+    cdef cppclass MapStorage(Storage):
+        pass
+
+cdef class mapstorage(storage):
+    def __cinit__(self):
+        self.ptr = new MapStorage()
+    def __dealloc__(self):
+        del self.ptr
+
+
 cdef extern from "AddKeyHandler.hpp":
     cdef cppclass AddKeyHandler:
+        AddKeyHandler(Storage * const storage)
         bool handle(string key, string jsonValue)
+        string get(string key)
 
 cdef class addkeyhandler:
     cdef AddKeyHandler * ptr
-    def __cinit__(self):
-        self.ptr = new AddKeyHandler()
+    def __cinit__(self, storage storage):
+        self.ptr = new AddKeyHandler(storage.ptr)
 
     def __dealloc__(self):
         del self.ptr
 
     cpdef bool handle(self, string key, string jsonValue):
         return self.ptr.handle(key, jsonValue)
+
+    cpdef string get(self, string key):
+        return self.ptr.get(key)
 
 cdef extern from "auth/BasicAuthenticator.cpp" namespace "auth":
     cdef cppclass BasicAuthenticator: 

@@ -22,17 +22,25 @@
  * SOFTWARE.                                                                                                                               
  **/
 
-#include "AddKeyHandler.hpp"
-#include <iostream>
+#ifndef MAP_STORAGE_H
+#define MAP_STORAGE_H
 
-AddKeyHandler::AddKeyHandler(Storage * const storage) : _storage(storage) {}
+#include "Storage.hpp"
 
-bool AddKeyHandler::handle(const std::string &  key, const std::string & jsonValue) {
-  std::cout << "Key: " << key << " Value: " << jsonValue << std::endl ;
-  _storage->put(key, jsonValue);
-  return true;
-}
+#include <map>
+#include <string>
 
-const std::string & AddKeyHandler::get(const std::string & key) {
-  return _storage->get(key);
-}
+
+class MapStorage : public Storage {
+public:
+
+  MapStorage();
+  virtual void put(const std::string & key, const std::string & value);
+  virtual const std::string & get(const std::string & key);
+  virtual std::list<std::string> searchKeys(const std::string &  pattern);
+
+private:
+  std::map<std::string, std::string> _map;
+};
+
+#endif // MAP_STORAGE_H

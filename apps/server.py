@@ -1,5 +1,5 @@
 import web
-from service import adder, basicauthenticator
+from service import adder, basicauthenticator, addkeyhandler, mapstorage
 from web.wsgiserver import CherryPyWSGIServer
 
 # Configure the location of the SSL certificates
@@ -8,7 +8,8 @@ CherryPyWSGIServer.ssl_private_key = "/etc/ssl/certs/server.key"
         
 # Configure the URL to handler mappings
 urls = (
-    '/addkey/(.*)', 'AddKeyHandler'
+    '/addkey/(.*)', 'AddKeyHandler',
+    '/getkey/(.*)', 'GetKeyHandler'
 )
 
 # Authenticator processor method
@@ -18,10 +19,16 @@ def handleAuth(handle):
     return handle()
 
 # Add key python handler wrapper
+st = mapstorage()
+addkey = addkeyhandler(st)
 class AddKeyHandler:
     def PUT(self, key_id):
-        print key_id
-        return 200
+        addkey.handle(key_id, web.data())
+        return web.OK
+
+class GetKeyHandler:
+    def GET(self, key_id):
+        return addkey.get(key_id)
 
 # This needs to be removed
 class hello:

@@ -26,11 +26,15 @@
 #define ADD_KEY_HANDLDER
 
 #include <string>
+#include <store/Storage.hpp>
 
 class AddKeyHandler {
 public:
+  AddKeyHandler(Storage * const storage);
   bool handle(const std::string &  key, const std::string & jsonValue);
-
+  const std::string & get(const std::string & key);
+private:
+  Storage * const _storage; 
 };
 
 #endif // ADD_KEY_HANDLDER

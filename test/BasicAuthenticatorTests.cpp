@@ -28,7 +28,7 @@
 
 BOOST_AUTO_TEST_CASE( TestConstructor )
 {
-  auth::BasicAuthenticator authenticator;
+  auth::BasicAuthenticator authenticator();
 }
 
 BOOST_AUTO_TEST_CASE( TestAlwaysReturnTrue )
