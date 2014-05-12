@@ -29,8 +29,15 @@ PROJECT(STDOUT_WRITER)
 # Make sure files under cmake/ are made available
 set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_LIST_DIR}/cmake )
 
-#Make sure we use C++11
-#SET(CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS}")
+################################################################################
+# Make sure we use C++11
+#
+# If The version of boost used is <= 1.49, then apply the patch provided in:
+# http://stackoverflow.com/questions/18552427/boost-read-json-and-c11
+# or comment out the next line 
+################################################################################
+SET(CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS}")
+
 # Compile Position Independent Code. This is a requirement of in order to allow
 # Python to load our cython modules.
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC") 
