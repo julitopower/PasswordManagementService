@@ -45,7 +45,9 @@ set(TESTS_LIBRARIES
 )
 
 # Create all the tests
-set(TEST_FILES AdderTests.cpp BasicAuthenticatorTests.cpp)
+set(TEST_FILES AdderTests.cpp
+               BasicAuthenticatorTests.cpp
+	       MapStorageTests.cpp)
 set(ALL_TESTS)
 foreach(FILE ${TEST_FILES})
   string(REGEX REPLACE ".cpp" "" NAME ${FILE})
