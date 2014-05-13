@@ -24,11 +24,11 @@ addkey = addkeyhandler(st)
 class AddKeyHandler:
     def PUT(self, key_id):
         addkey.handle(key_id, web.data())
-        return web.OK
+        return web.OK()
 
 class GetKeyHandler:
     def GET(self, key_id):
-        return addkey.get(key_id)
+        return addkey.get(key_id).getStatus()
 
 # This needs to be removed
 class hello:

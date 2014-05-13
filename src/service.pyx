@@ -44,6 +44,37 @@ cdef class adder:
     cpdef int add(self, string json):
         return self.ptr.add(json)
 
+# Http Response
+cdef extern from "http/Response.cpp" namespace "http":
+    cdef cppclass Response: 
+        Response()
+        string getStatus() const
+        string getBody() const
+        void setStatus(string status)
+        void setBody(string body)
+
+cdef class response:
+    cdef Response * ptr
+
+    def __cinit__(self):
+        self.ptr = new Response()
+
+    def __dealloc__(self):
+        #del self.ptr
+        pass
+
+    cpdef setStatus(self, string st):
+        self.ptr.setStatus(st);
+
+    cpdef string getStatus(self):
+        return self.ptr.getStatus()
+
+    cpdef setBody(self, string body):
+        self.ptr.setBody(body)
+
+    cpdef string getBody(self):
+        return self.ptr.getBody()
+
 # Trying to implement CPP polymorphism using Cython
 cdef extern from "store/Storage.hpp":
     cdef cppclass Storage:
@@ -65,8 +96,8 @@ cdef class mapstorage(storage):
 cdef extern from "AddKeyHandler.hpp":
     cdef cppclass AddKeyHandler:
         AddKeyHandler(Storage * const storage)
-        bool handle(string key, string jsonValue)
-        string get(string key)
+        Response handle(string key, string jsonValue)
+        Response get(string key)
 
 cdef class addkeyhandler:
     cdef AddKeyHandler * ptr
@@ -75,12 +106,21 @@ cdef class addkeyhandler:
 
     def __dealloc__(self):
         del self.ptr
+        pass
 
-    cpdef bool handle(self, string key, string jsonValue):
-        return self.ptr.handle(key, jsonValue)
+    cpdef response handle(self, string key, string jsonValue):
+        r = response()
+        cdef Response resp = self.ptr.handle(key, jsonValue)
+        r.setStatus(resp.getStatus())
+        r.setBody(resp.getBody())
+        return r
 
-    cpdef string get(self, string key):
-        return self.ptr.get(key)
+    cpdef response get(self, string key):
+        r = response()
+        cdef Response resp = self.ptr.get(key)
+        r.setStatus(resp.getStatus())
+        r.setBody(resp.getBody())
+        return r
 
 cdef extern from "auth/BasicAuthenticator.cpp" namespace "auth":
     cdef cppclass BasicAuthenticator: 
@@ -97,3 +137,6 @@ cdef class basicauthenticator:
 
     cpdef bool authenticate(self, string key, string value):
         return self.ptr.authenticate(key, value)
+
+#############################################################
+

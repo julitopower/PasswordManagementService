@@ -22,22 +22,24 @@
  * SOFTWARE.                                                                                                                               
  **/
 
-#include "AddKeyHandler.hpp"
-#include <iostream>
+#include "Response.hpp"
 
-AddKeyHandler::AddKeyHandler(Storage * const storage) : _storage(storage) {}
+namespace http {
+  Response::Response() : _status(), _body() {}
 
-http::Response AddKeyHandler::handle(const std::string &  key, const std::string & jsonValue) {
-  std::cout << "Key: " << key << " Value: " << jsonValue << std::endl ;
-  _storage->put(key, jsonValue);
-  http::Response r;
-  r.setStatus(201);
-  return r;
-}
+  void Response::setStatus(const int & status) {
+    _status = "200 OK";
+  }
 
-http::Response AddKeyHandler::get(const std::string & key) {
-  http::Response r;
-  r.setStatus(200);
-  r.setBody(_storage->get(key));
-  return r;
+  void Response::setBody(const std::string &  body) {
+    _body = body;
+  }
+
+  const std::string & Response::getStatus() const {
+    return _status;
+  }
+
+  const std::string & Response::getBody() const {
+    return _body;
+  }
 }

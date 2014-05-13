@@ -27,12 +27,13 @@
 
 #include <string>
 #include <store/Storage.hpp>
+#include <http/Response.hpp>
 
 class AddKeyHandler {
 public:
   AddKeyHandler(Storage * const storage);
-  bool handle(const std::string &  key, const std::string & jsonValue);
-  const std::string & get(const std::string & key);
+  http::Response handle(const std::string &  key, const std::string & jsonValue);
+  http::Response get(const std::string & key);
 private:
   Storage * const _storage; 
 };
