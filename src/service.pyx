@@ -21,6 +21,7 @@
  # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE                                                           
  # SOFTWARE.                                                                                                                               
  ##/
+
 from libcpp.string cimport string
 from libcpp cimport bool
 from cython.operator cimport dereference as deref
@@ -45,36 +46,32 @@ cdef class adder:
         return self.ptr.add(json)
 
 # Http Response
-cdef extern from "http/Response.cpp" namespace "http":
+cdef extern from "http/Response.hpp" namespace "http":
     cdef cppclass Response: 
         Response()
-        string getStatus() const
-        string getBody() const
-        void setStatus(string status)
-        void setBody(string body)
+        string & getStatus() const
+        string & getBody() const
 
 cdef class response:
     cdef Response * ptr
 
-    def __cinit__(self):
-        self.ptr = new Response()
+    def __cinit__(self, create_ptr = True):
+        if create_ptr:
+            self.ptr = new Response()
 
     def __dealloc__(self):
-        #del self.ptr
+        del self.ptr
         pass
-
-    cpdef setStatus(self, string st):
-        self.ptr.setStatus(st);
 
     cpdef string getStatus(self):
         return self.ptr.getStatus()
 
-    cpdef setBody(self, string body):
-        self.ptr.setBody(body)
-
     cpdef string getBody(self):
         return self.ptr.getBody()
 
+    cdef setPtr(self, Response * resp):
+        del self.ptr
+        self.ptr = resp
 # Trying to implement CPP polymorphism using Cython
 cdef extern from "store/Storage.hpp":
     cdef cppclass Storage:
@@ -96,8 +93,8 @@ cdef class mapstorage(storage):
 cdef extern from "AddKeyHandler.hpp":
     cdef cppclass AddKeyHandler:
         AddKeyHandler(Storage * const storage)
-        Response handle(string key, string jsonValue)
-        Response get(string key)
+        Response * handle(string key, string jsonValue)
+        Response * get(string key)
 
 cdef class addkeyhandler:
     cdef AddKeyHandler * ptr
@@ -109,17 +106,15 @@ cdef class addkeyhandler:
         pass
 
     cpdef response handle(self, string key, string jsonValue):
-        r = response()
-        cdef Response resp = self.ptr.handle(key, jsonValue)
-        r.setStatus(resp.getStatus())
-        r.setBody(resp.getBody())
+        r = response(False)
+        cdef Response * resp = self.ptr.handle(key, jsonValue)
+        r.setPtr(resp)
         return r
 
     cpdef response get(self, string key):
-        r = response()
-        cdef Response resp = self.ptr.get(key)
-        r.setStatus(resp.getStatus())
-        r.setBody(resp.getBody())
+        r = response(False)
+        cdef Response * resp = self.ptr.get(key)
+        r.setPtr(resp)
         return r
 
 cdef extern from "auth/BasicAuthenticator.cpp" namespace "auth":

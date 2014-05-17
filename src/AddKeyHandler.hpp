@@ -32,8 +32,8 @@
 class AddKeyHandler {
 public:
   AddKeyHandler(Storage * const storage);
-  http::Response handle(const std::string &  key, const std::string & jsonValue);
-  http::Response get(const std::string & key);
+  http::Response *  handle(const std::string &  key, const std::string & jsonValue);
+  http::Response *  get(const std::string & key);
 private:
   Storage * const _storage; 
 };

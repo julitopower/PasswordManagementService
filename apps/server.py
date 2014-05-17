@@ -23,12 +23,14 @@ st = mapstorage()
 addkey = addkeyhandler(st)
 class AddKeyHandler:
     def PUT(self, key_id):
-        addkey.handle(key_id, web.data())
-        return web.OK()
+        resp = addkey.handle(key_id, web.data())
+        web.OK()
+        return resp.getBody()
 
 class GetKeyHandler:
     def GET(self, key_id):
-        return addkey.get(key_id).getStatus()
+        web.OK()
+        return addkey.get(key_id).getBody()
 
 # This needs to be removed
 class hello:
@@ -42,3 +44,8 @@ if __name__ == "__main__":
     app = web.application(urls, globals())
     app.add_processor(handleAuth)
     app.run()
+
+    # Use the following line to launch the server with profiling
+    # information. Profiling is sent to the clients calling the
+    # server
+    #app.run(web.http.profiler)

@@ -24,20 +24,24 @@
 
 #include "AddKeyHandler.hpp"
 #include <iostream>
+#include <sstream>
 
 AddKeyHandler::AddKeyHandler(Storage * const storage) : _storage(storage) {}
 
-http::Response AddKeyHandler::handle(const std::string &  key, const std::string & jsonValue) {
-  std::cout << "Key: " << key << " Value: " << jsonValue << std::endl ;
+http::Response * AddKeyHandler::handle(const std::string &  key, const std::string & jsonValue) {
+  std::stringstream ss;
+  ss << "Key: " << key << " Value: " << jsonValue << std::endl ;
+  std::cout << ss.str();
   _storage->put(key, jsonValue);
-  http::Response r;
-  r.setStatus(201);
+  http::Response * r = new http::Response();
+  r->setStatus(201);
+  r->setBody(ss.str());
   return r;
 }
 
-http::Response AddKeyHandler::get(const std::string & key) {
-  http::Response r;
-  r.setStatus(200);
-  r.setBody(_storage->get(key));
+http::Response * AddKeyHandler::get(const std::string & key) {
+  http::Response * r = new http::Response();;
+  r->setStatus(200);
+  r->setBody(_storage->get(key));
   return r;
 }
