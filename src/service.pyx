@@ -26,25 +26,6 @@ from libcpp.string cimport string
 from libcpp cimport bool
 from cython.operator cimport dereference as deref
 
-# Import CPP class definition. Declare methods needed in this
-# particular file
-cdef extern from "Adder.hpp":
-    cdef cppclass Adder:
-        Adder()
-        int add(string json)
-
-# Python class that we use to wrap the CPP one.
-cdef class adder:
-    cdef Adder* ptr
-    def __cinit__(self):
-        self.ptr = new Adder()
-
-    def __dealloc__(self):
-        del self.ptr
-
-    cpdef int add(self, string json):
-        return self.ptr.add(json)
-
 # Http Response
 cdef extern from "http/Response.hpp" namespace "http":
     cdef cppclass Response: 
@@ -90,24 +71,24 @@ cdef class mapstorage(storage):
         del self.ptr
 
 
-cdef extern from "AddKeyHandler.hpp":
-    cdef cppclass AddKeyHandler:
-        AddKeyHandler(Storage * const storage)
-        Response * handle(string key, string jsonValue)
+cdef extern from "KeyHandler.hpp":
+    cdef cppclass KeyHandler:
+        KeyHandler(Storage * const storage)
+        Response * put(string key, string jsonValue)
         Response * get(string key)
 
-cdef class addkeyhandler:
-    cdef AddKeyHandler * ptr
+cdef class keyhandler:
+    cdef KeyHandler * ptr
     def __cinit__(self, storage storage):
-        self.ptr = new AddKeyHandler(storage.ptr)
+        self.ptr = new KeyHandler(storage.ptr)
 
     def __dealloc__(self):
         del self.ptr
         pass
 
-    cpdef response handle(self, string key, string jsonValue):
+    cpdef response put(self, string key, string jsonValue):
         r = response(False)
-        cdef Response * resp = self.ptr.handle(key, jsonValue)
+        cdef Response * resp = self.ptr.put(key, jsonValue)
         r.setPtr(resp)
         return r
 

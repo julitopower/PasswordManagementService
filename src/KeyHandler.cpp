@@ -22,31 +22,46 @@
  * SOFTWARE.                                                                                                                               
  **/
 
-#include "Adder.hpp"
+#include "KeyHandler.hpp"
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/foreach.hpp>
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
-Adder::Adder(){}
+KeyHandler::KeyHandler(Storage * const storage) : _storage(storage) {}
 
-int Adder::add(const std::string & json) const {
+http::Response * KeyHandler::put(const std::string &  key, const std::string & jsonValue) {
+
+  // Load Json in a StringStream, for some reason the read_json
+  // method does not work with a "raw" string
+  std::stringstream ss;
+  ss << jsonValue;
+
+  // Create our Json tree
   using boost::property_tree::ptree;
   ptree tree;
-  std::stringstream ss;
-  ss << json;
 
-  // Here goes the processing
-  int acum = 0;
+  // Read Json and return appropiate value
+  http::Response * r = new http::Response();
   try {
     read_json(ss, tree);
-    BOOST_FOREACH(ptree::value_type & v , tree.get_child("numbers")) {
-      acum += v.second.get_value<int>();
-    }
+    std::string value = tree.get<std::string>("value");
+    _storage->put(key, value);    
+
+    r->setStatus(201);
+    r->setBody(ss.str());
   } catch(...) {
-    return 0;
+    r->setStatus(400);
+    r->setBody("Not Valid Json");
   }
-  return acum;
+  return r;
+}
+
+http::Response * KeyHandler::get(const std::string & key) {
+  http::Response * r = new http::Response();;
+  r->setStatus(200);
+  r->setBody(_storage->get(key));
+  return r;
 }

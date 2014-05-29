@@ -22,15 +22,23 @@
  * SOFTWARE.                                                                                                                               
  **/
 
-#ifndef ADDER_H
-#define ADDER_H
+#ifndef KEY_HANDLER
+#define KEY_HANDLER
 
 #include <string>
+#include <store/Storage.hpp>
+#include <http/Response.hpp>
 
-class Adder {
+/**
+ * This class handles basic operations related to Key/Value, including add/get.
+ */
+class KeyHandler {
 public:
-  Adder();
-  int add(const std::string & json) const;
+  KeyHandler(Storage * const storage);
+  http::Response *  put(const std::string &  key, const std::string & jsonValue);
+  http::Response *  get(const std::string & key);
+private:
+  Storage * const _storage; 
 };
 
-#endif //ADDER_H
+#endif // ADD_KEY_HANDLDER

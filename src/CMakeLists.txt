@@ -23,8 +23,7 @@
  ##
 ADD_SUBDIRECTORY(auth)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
-SET(src Adder.cpp 
-        AddKeyHandler.cpp 
+SET(src KeyHandler.cpp 
 	store/MapStorage.cpp
 	http/Response.cpp)
 SET(src_auth auth/BasicAuthenticator.cpp)
