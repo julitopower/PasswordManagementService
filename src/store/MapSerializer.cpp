@@ -2,7 +2,7 @@
  * The MIT License (MIT)
  *
  * Copyright (c) 2014 Julio Delgado
-
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -22,27 +22,34 @@
  * SOFTWARE.
  **/
 
-#ifndef MAP_STORAGE_H
-#define MAP_STORAGE_H
-
-#include "Storage.hpp"
 #include "MapSerializer.hpp"
-#include <map>
-#include <string>
+#include <fstream>
 
+namespace storage {
 
-class MapStorage : public Storage {
-public:
+  static const std::string & FILE_PATH = "/tmp/map";
 
-  MapStorage();
-  virtual void put(const std::string & key, const std::string & value);
-  virtual const std::string & get(const std::string & key);
-  virtual std::list<std::string> searchKeys(const std::string &  pattern);
-  virtual ~MapStorage() override;
+  void MapSerializer::write(const std::map<std::string, std::string> &  map) const {
+    std::ofstream file;
+    file.open(FILE_PATH);
+    for(auto entry = map.begin() ; entry != map.end() ; ++entry) {
+      file << entry->first << std::endl;
+      file << entry->second << std::endl;
+    }
+    file.close();
+  }
 
-private:
-  std::map<std::string, std::string> * _map;
-  storage::MapSerializer _serializer;
-};
+  std::map<std::string, std::string> * MapSerializer::read() const {
+    auto map = new std::map<std::string, std::string>();
 
-#endif // MAP_STORAGE_H
+    std::ifstream file;
+    file.open(FILE_PATH);
+    std::string key, value;
+    while(getline(file, key)) {
+      getline(file, value);
+      (*map)[key] = value;
+    }
+    return map;
+  }
+
+}
