@@ -47,7 +47,8 @@ FIND_PACKAGE(Boost COMPONENTS unit_test_framework REQUIRED)
 MESSAGE(STATUS "Boost Libraries ${Boost_INCLUDE_DIRS}")
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
 INCLUDE( UseCython )
-#FIND_PACKAGE(Cython REQUIRED)
+
+FIND_PACKAGE(OpenSSL)
 
 #Include subdirectories
 ADD_SUBDIRECTORY(src)

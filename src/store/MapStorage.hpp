@@ -36,7 +36,7 @@ public:
 
   MapStorage();
   virtual void put(const std::string & key, const std::string & value);
-  virtual const std::string & get(const std::string & key);
+  virtual std::string get(const std::string & key);
   virtual std::list<std::string> searchKeys(const std::string &  pattern);
   virtual ~MapStorage() override;
 

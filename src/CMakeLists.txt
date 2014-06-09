@@ -31,8 +31,7 @@ SET(src_auth auth/BasicAuthenticator.cpp)
 
 # Generate Static Libraries for the C++ code
 ADD_LIBRARY(PasswordService STATIC ${src} ${src_auth})
-
-
+TARGET_LINK_LIBRARIES(PasswordService crypto)
 #Wire the Cython magic here
 # If the pyx file is a C++ file, we should specify that here.
 SET_SOURCE_FILES_PROPERTIES(
