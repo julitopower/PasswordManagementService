@@ -38,8 +38,8 @@ BOOST_AUTO_TEST_CASE( TestWhatYouPutIsWhatYouGet )
   Storage * st = new MapStorage();
   const std::string & key = "key";
   const std::string & value = "value";
-  st->put(key, value);
-  const std::string & output = st->get(key);
+  st->put(key, value, nullptr, nullptr);
+  const std::string & output = st->get(key, nullptr, nullptr);
   BOOST_CHECK_EQUAL(value, output);
   delete st;
 }
@@ -49,8 +49,8 @@ BOOST_AUTO_TEST_CASE( TestPutGetEmtpyString )
   Storage * st = new MapStorage();
   const std::string & key = "key";
   const std::string & value = "";
-  st->put(key, value);
-  const std::string & output = st->get(key);
+  st->put(key, value, nullptr, nullptr);
+  const std::string & output = st->get(key, nullptr, nullptr);
   BOOST_CHECK_EQUAL(value, output);
   delete st;
 }
@@ -60,8 +60,8 @@ BOOST_AUTO_TEST_CASE( TestGetNonExistingKey )
   Storage * st = new MapStorage();
   const std::string & key = "key";
   const std::string & value = "value";
-  st->put(key, value);
-  const std::string & output = st->get("Nope");
+  st->put(key, value, nullptr, nullptr);
+  const std::string & output = st->get("Nope", nullptr, nullptr);
   BOOST_CHECK(output == "");
   delete st;
 }
@@ -72,9 +72,9 @@ BOOST_AUTO_TEST_CASE( TestPutTwiceThenGet )
   const std::string & key = "key";
   const std::string & value = "value";
   const std::string & value2 = "other_value";
-  st->put(key, value);
-  st->put(key, value2);
-  const std::string & output = st->get(key);
+  st->put(key, value, nullptr, nullptr);
+  st->put(key, value2, nullptr, nullptr);
+  const std::string & output = st->get(key, nullptr, nullptr);
   BOOST_CHECK_EQUAL(value2, output);
   delete st;
 }

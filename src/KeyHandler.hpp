@@ -35,8 +35,13 @@
 class KeyHandler {
 public:
   KeyHandler(Storage * const storage);
-  http::Response *  put(const std::string &  key, const std::string & jsonValue);
-  http::Response *  get(const std::string & key);
+  http::Response *  put(const std::string &  key,
+			const std::string & jsonValue,
+			const unsigned char * pwd1,
+			const unsigned char * pwd2);
+  http::Response *  get(const std::string & key,
+			const unsigned char * pwd1,
+			const unsigned char * pwd2);;
 private:
   Storage * const _storage; 
 };

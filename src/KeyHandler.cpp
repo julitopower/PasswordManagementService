@@ -32,7 +32,10 @@
 
 KeyHandler::KeyHandler(Storage * const storage) : _storage(storage) {}
 
-http::Response * KeyHandler::put(const std::string &  key, const std::string & jsonValue) {
+http::Response * KeyHandler::put(const std::string &  key,
+				 const std::string & jsonValue,
+				 const unsigned char * pwd1,
+				 const unsigned char * pwd2) {
 
   // Load Json in a StringStream, for some reason the read_json
   // method does not work with a "raw" string
@@ -48,7 +51,7 @@ http::Response * KeyHandler::put(const std::string &  key, const std::string & j
   try {
     read_json(ss, tree);
     std::string value = tree.get<std::string>("value");
-    _storage->put(key, value);    
+    _storage->put(key, value, pwd1, pwd2);    
 
     r->setStatus(201);
     r->setBody(ss.str());
@@ -59,9 +62,12 @@ http::Response * KeyHandler::put(const std::string &  key, const std::string & j
   return r;
 }
 
-http::Response * KeyHandler::get(const std::string & key) {
-  http::Response * r = new http::Response();;
+http::Response * KeyHandler::get(const std::string & key,
+				 const unsigned char * pwd1,
+				 const unsigned char * pwd2) {
+
+  http::Response * r = new http::Response();
   r->setStatus(200);
-  r->setBody(_storage->get(key));
+  r->setBody(_storage->get(key, pwd1, pwd2));
   return r;
 }

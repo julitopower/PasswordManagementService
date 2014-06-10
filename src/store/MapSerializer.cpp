@@ -31,7 +31,7 @@ namespace storage {
 
   void MapSerializer::write(const std::map<std::string, std::string> &  map) const {
     std::ofstream file;
-    file.open(FILE_PATH);
+    file.open(FILE_PATH, std::fstream::out | std::fstream::app);
     for(auto entry = map.begin() ; entry != map.end() ; ++entry) {
       file << entry->first << std::endl;
       file << entry->second << std::endl;
@@ -43,7 +43,7 @@ namespace storage {
     auto map = new std::map<std::string, std::string>();
 
     std::ifstream file;
-    file.open(FILE_PATH);
+    file.open(FILE_PATH, std::fstream::in);
     std::string key, value;
     while(getline(file, key)) {
       getline(file, value);

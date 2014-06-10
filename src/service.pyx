@@ -74,8 +74,8 @@ cdef class mapstorage(storage):
 cdef extern from "KeyHandler.hpp":
     cdef cppclass KeyHandler:
         KeyHandler(Storage * const storage)
-        Response * put(string key, string jsonValue)
-        Response * get(string key)
+        Response * put(string key, string jsonValue, unsigned char* pwd1, unsigned char* pwd2)
+        Response * get(string key, unsigned char * pwd1, unsigned char * pwd2)
 
 cdef class keyhandler:
     cdef KeyHandler * ptr
@@ -86,15 +86,15 @@ cdef class keyhandler:
         del self.ptr
         pass
 
-    cpdef response put(self, string key, string jsonValue):
+    cpdef response put(self, string key, string jsonValue, unsigned char * pwd1, unsigned char * pwd2):
         r = response(False)
-        cdef Response * resp = self.ptr.put(key, jsonValue)
+        cdef Response * resp = self.ptr.put(key, jsonValue, pwd1, pwd2)
         r.setPtr(resp)
         return r
 
-    cpdef response get(self, string key):
+    cpdef response get(self, string key, unsigned char * pwd1, unsigned char * pwd2):
         r = response(False)
-        cdef Response * resp = self.ptr.get(key)
+        cdef Response * resp = self.ptr.get(key, pwd1, pwd2)
         r.setPtr(resp)
         return r
 

@@ -22,13 +22,19 @@ st = mapstorage()
 addkey = keyhandler(st)
 class KeyHandler:
     def PUT(self, key_id):
-        resp = addkey.put(key_id, web.data())
+        print web.ctx.env
+        resp = addkey.put(key_id, web.data(),
+                          web.ctx.env.get("HTTP_X_CREDENTIALS"),
+                          web.ctx.env.get("HTTP_X_PASSWORD"))
         web.OK()
         return resp.getBody()
 
     def GET(self, key_id):
+        print web.ctx.env
         web.OK()
-        return addkey.get(key_id).getBody()
+        return addkey.get(key_id, 
+                          web.ctx.env.get("HTTP_X_CREDENTIALS"),
+                          web.ctx.env.get("HTTP_X_PASSWORD")).getBody()
 
 # Wire everything together and launch the server
 if __name__ == "__main__":

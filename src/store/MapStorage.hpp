@@ -35,9 +35,16 @@ class MapStorage : public Storage {
 public:
 
   MapStorage();
-  virtual void put(const std::string & key, const std::string & value);
-  virtual std::string get(const std::string & key);
-  virtual std::list<std::string> searchKeys(const std::string &  pattern);
+  virtual void put(const std::string & key,
+		   const std::string & value,
+		   const unsigned char * pwd1,
+		   const unsigned char * pwd2);
+  virtual std::string get(const std::string & key,
+			  const unsigned char * pwd1,
+			  const unsigned char * pwd2);
+  virtual std::list<std::string> searchKeys(const std::string &  pattern,
+					    const unsigned char * pwd);
+
   virtual ~MapStorage() override;
 
 private:

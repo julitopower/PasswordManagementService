@@ -30,9 +30,15 @@
 
 class Storage {
 public:
-  virtual void put(const std::string & key, const std::string & value) = 0;
-  virtual std::string get(const std::string & key) = 0;
-  virtual std::list<std::string> searchKeys(const std::string &  pattern) = 0;
+  virtual void put(const std::string & key,
+		   const std::string & value,
+		   const unsigned char * pwd1,
+		   const unsigned char * pwd2) = 0;
+  virtual std::string get(const std::string & key,
+			  const unsigned char * pwd1,
+			  const unsigned char * pwd2) = 0;
+  virtual std::list<std::string> searchKeys(const std::string &  pattern,
+					    const unsigned char * pwd) = 0;
   virtual ~Storage() {};
 };
 

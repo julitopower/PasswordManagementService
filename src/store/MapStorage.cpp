@@ -26,22 +26,28 @@
 #include <openssl/evp.h>
 #include <iostream>
 
-static std::string encrypt(const std::string text, const std::string key);
-static std::string decrypt(const std::string text, const std::string key);
+static std::string encrypt(const std::string text, const unsigned char * k);
+static std::string decrypt(const std::string text, const unsigned char * k);
 
 MapStorage::MapStorage() :  _serializer(),
 			    _map(_serializer.read()) {}
 
-void MapStorage::put(const std::string & key, const std::string & value) {
-  (*_map)[encrypt(key, "holacaracola")] = encrypt(value, "holacaracola");
+void MapStorage::put(const std::string & key,
+		     const std::string & value,
+		     const unsigned char * pwd1,
+		     const unsigned char * pwd2) {
+  (*_map)[encrypt(key, pwd1)] = encrypt(value, pwd2);
   _serializer.write(*_map);
 }
 
-std::string MapStorage::get(const std::string & key) {
-  return decrypt((*_map)[encrypt(key, "holacaracola")], "holacaracola");
+std::string MapStorage::get(const std::string & key,
+			    const unsigned char * pwd1,
+			    const unsigned char * pwd2) {
+  return decrypt((*_map)[encrypt(key, pwd1)], pwd2);
 }
 
-std::list<std::string> MapStorage::searchKeys(const std::string &  pattern) {
+std::list<std::string> MapStorage::searchKeys(const std::string &  pattern,
+					      const unsigned char * pwd1) {
   std::list<std::string> results;
   return results;
 }
@@ -52,14 +58,13 @@ MapStorage::~MapStorage() {
 
 // Encrypt/Decrypt functions here
 
-static std::string encrypt(const std::string text, const std::string key) {
+static std::string encrypt(const std::string text, const unsigned char * k) {
   EVP_CIPHER_CTX ctx;
   EVP_CIPHER_CTX_init(&ctx);
 
   int outlen, tmplen;
   unsigned char * outbuf = new unsigned char[text.length() * 100];
   const unsigned char iv[] = {'i','e','n','c','t','y','e','k'};
-  const unsigned char * k = reinterpret_cast<const unsigned char*>(key.data());
   const unsigned char * in = reinterpret_cast<const unsigned char*>(text.data());
   EVP_EncryptInit_ex(&ctx, EVP_bf_cbc(), NULL, k, iv);
 
@@ -72,14 +77,13 @@ static std::string encrypt(const std::string text, const std::string key) {
   return s;
 }
 
-static std::string decrypt(const std::string text, const std::string key) {
+static std::string decrypt(const std::string text, const unsigned char * k) {
   EVP_CIPHER_CTX ctx;
   EVP_CIPHER_CTX_init(&ctx);
 
   int outlen, tmplen;
   unsigned char * outbuf = new unsigned char[text.length() * 100];
   const unsigned char iv[] = {'i','e','n','c','t','y','e','k'};
-  const unsigned char * k = reinterpret_cast<const unsigned char*>(key.data());
   const unsigned char * in = reinterpret_cast<const unsigned char*>(text.data());
   EVP_DecryptInit_ex(&ctx, EVP_bf_cbc(), NULL, k, iv);
 
