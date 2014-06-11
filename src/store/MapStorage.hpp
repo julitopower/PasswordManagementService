@@ -48,7 +48,7 @@ public:
   virtual ~MapStorage() override;
 
 private:
-  std::map<std::string, std::string> * _map;
+  std::map<std::vector<char>, std::vector<char> > * _map;
   storage::MapSerializer _serializer;
 };
 

@@ -26,14 +26,15 @@
 #define MAP_SERIALIZER_H
 
 #include <string>
+#include <vector>
 #include <map>
 
 namespace storage {
 
   class MapSerializer {
   public:
-    void write(const std::map<std::string, std::string> & map) const;
-    std::map<std::string, std::string> * read() const;
+    void write(const std::map<std::vector<char>, std::vector<char>> & map) const;
+    std::map<std::vector<char>, std::vector<char>> * read() const;
   };
 }
 

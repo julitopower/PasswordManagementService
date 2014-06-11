@@ -24,31 +24,54 @@
 
 #include "MapSerializer.hpp"
 #include <fstream>
+#include <iostream>
+#include <cstdlib>
+#include <cstdio>
 
 namespace storage {
 
   static const std::string & FILE_PATH = "/tmp/map";
 
-  void MapSerializer::write(const std::map<std::string, std::string> &  map) const {
+  void MapSerializer::write(const std::map<std::vector<char>, std::vector<char> > &  map) const {
     std::ofstream file;
-    file.open(FILE_PATH, std::fstream::out | std::fstream::app);
+    file.open(FILE_PATH, std::fstream::out | std::fstream::binary);
     for(auto entry = map.begin() ; entry != map.end() ; ++entry) {
-      file << entry->first << std::endl;
-      file << entry->second << std::endl;
+      char size = entry->first.size();
+      file.write(&size, 1);
+      file.write((char *)(&entry->first),(int) size);
+      
+      size = entry->second.size();
+      file.write(&size, 1);
+      file.write((char *)(&entry->second), (int)size);
     }
     file.close();
   }
 
-  std::map<std::string, std::string> * MapSerializer::read() const {
-    auto map = new std::map<std::string, std::string>();
+  std::map<std::vector<char>, std::vector<char> > * MapSerializer::read() const {
+    auto map = new std::map<std::vector<char>, std::vector<char> >();
 
     std::ifstream file;
-    file.open(FILE_PATH, std::fstream::in);
-    std::string key, value;
-    while(getline(file, key)) {
-      getline(file, value);
-      (*map)[key] = value;
+    file.open(FILE_PATH, std::fstream::in | std::fstream::binary);
+
+    if(!file.is_open()) return map;
+    while(!file.eof()) {
+      char size;
+      file.read(&size,1);
+      std::cout << "Reading Key " << (int)size << std::endl;
+      char * key = new char[size];
+      file.read(key,size);
+      std::vector<char> keyVector(key, key + (int)size);
+
+      file.read(&size,1);
+      std::cout << "Reading Value " << (int)size << std::endl;
+      char * value = new char[size];
+      file.read(value, size);
+      std::vector<char> valueVector(value, value + (int)size);
+      (*map)[keyVector] = valueVector;
+      delete[] key;
+      delete[] value;
     }
+    file.close();
     return map;
   }
 

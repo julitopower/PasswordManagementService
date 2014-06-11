@@ -26,8 +26,8 @@
 #include <openssl/evp.h>
 #include <iostream>
 
-static std::string encrypt(const std::string text, const unsigned char * k);
-static std::string decrypt(const std::string text, const unsigned char * k);
+static std::vector<char> encrypt(const std::vector<char> text, const unsigned char * k);
+static std::vector<char> decrypt(const std::vector<char> text, const unsigned char * k);
 
 MapStorage::MapStorage() :  _serializer(),
 			    _map(_serializer.read()) {}
@@ -36,14 +36,28 @@ void MapStorage::put(const std::string & key,
 		     const std::string & value,
 		     const unsigned char * pwd1,
 		     const unsigned char * pwd2) {
-  (*_map)[encrypt(key, pwd1)] = encrypt(value, pwd2);
+  std::vector<char> rawKeyVector(key.begin(), key.end());
+  std::vector<char> keyVector = encrypt(rawKeyVector, pwd1);
+
+  std::vector<char> rawValueVector(value.begin(), value.end());
+  std::vector<char> valueVector(encrypt(rawValueVector, pwd2));
+
+  (*_map)[keyVector] = valueVector;
   _serializer.write(*_map);
 }
 
 std::string MapStorage::get(const std::string & key,
 			    const unsigned char * pwd1,
 			    const unsigned char * pwd2) {
-  return decrypt((*_map)[encrypt(key, pwd1)], pwd2);
+  std::vector<char> rawKeyVector(key.begin(), key.end());
+  std::vector<char> encryptedKey = encrypt(rawKeyVector, pwd1);
+  if(_map->find(encryptedKey) != _map->end()) {
+     std::vector<char> valueVector  = decrypt((*_map)[encryptedKey], pwd2);
+     
+     return std::string(valueVector.begin(), valueVector.end());
+  }
+  std::cout << "Key " << key << " Not found" << std::endl;
+  return "";
 }
 
 std::list<std::string> MapStorage::searchKeys(const std::string &  pattern,
@@ -58,40 +72,39 @@ MapStorage::~MapStorage() {
 
 // Encrypt/Decrypt functions here
 
-static std::string encrypt(const std::string text, const unsigned char * k) {
+static std::vector<char> encrypt(const std::vector<char> text, const unsigned char * k) {
   EVP_CIPHER_CTX ctx;
   EVP_CIPHER_CTX_init(&ctx);
 
   int outlen, tmplen;
-  unsigned char * outbuf = new unsigned char[text.length() * 100];
+  unsigned char * outbuf = new unsigned char[text.size() * 100];
   const unsigned char iv[] = {'i','e','n','c','t','y','e','k'};
-  const unsigned char * in = reinterpret_cast<const unsigned char*>(text.data());
   EVP_EncryptInit_ex(&ctx, EVP_bf_cbc(), NULL, k, iv);
 
-  EVP_EncryptUpdate(&ctx, outbuf, &outlen, in, text.length());
+  EVP_EncryptUpdate(&ctx, outbuf, &outlen, (unsigned char*)text.data(), text.size());
+
   EVP_EncryptFinal_ex(&ctx, outbuf + outlen, &tmplen);
   outlen += tmplen;
   EVP_CIPHER_CTX_cleanup(&ctx);
-  std::string s(reinterpret_cast<const char*>(outbuf), outlen);
-  std::cout << s << std::endl;
+  
+  std::vector<char> s(outbuf, outbuf + outlen);
   return s;
 }
 
-static std::string decrypt(const std::string text, const unsigned char * k) {
+static std::vector<char> decrypt(const std::vector<char> text, const unsigned char * k) {
   EVP_CIPHER_CTX ctx;
   EVP_CIPHER_CTX_init(&ctx);
 
   int outlen, tmplen;
-  unsigned char * outbuf = new unsigned char[text.length() * 100];
+  unsigned char * outbuf = new unsigned char[text.size() * 100];
   const unsigned char iv[] = {'i','e','n','c','t','y','e','k'};
-  const unsigned char * in = reinterpret_cast<const unsigned char*>(text.data());
   EVP_DecryptInit_ex(&ctx, EVP_bf_cbc(), NULL, k, iv);
 
-  EVP_DecryptUpdate(&ctx, outbuf, &outlen, in, text.length());
+  EVP_DecryptUpdate(&ctx, outbuf, &outlen, (unsigned char*)&text[0], text.size());
   EVP_DecryptFinal_ex(&ctx, outbuf + outlen, &tmplen);
   outlen += tmplen;
   EVP_CIPHER_CTX_cleanup(&ctx);
-  std::string s(reinterpret_cast<const char*>(outbuf), outlen);
-  std::cout << s << std::endl;
+
+  std::vector<char> s(outbuf, outbuf + outlen);
   return s;
 }
