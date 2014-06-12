@@ -41,7 +41,9 @@ public:
 			const unsigned char * pwd2);
   http::Response *  get(const std::string & key,
 			const unsigned char * pwd1,
-			const unsigned char * pwd2);;
+			const unsigned char * pwd2);
+
+  http::Response * listKeys(const unsigned char * pwd);
 private:
   Storage * const _storage; 
 };

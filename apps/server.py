@@ -8,7 +8,8 @@ CherryPyWSGIServer.ssl_private_key = "/etc/ssl/certs/server.key"
         
 # Configure the URL to handler mappings
 urls = (
-    '/key/(.*)', 'KeyHandler'
+    '/key/(.*)', 'KeyHandler',
+    '/keys', 'KeySearcher'
 )
 
 # Authenticator processor method
@@ -18,23 +19,29 @@ def handleAuth(handle):
     return handle()
 
 # Add key python handler wrapper
+cred = "laskjdflskdfjalsdfjlsakfjdlsdjkfaj"
+pwd = "1234kj12lsadgDGs"
 st = mapstorage()
-addkey = keyhandler(st)
+keyHandler = keyhandler(st)
 class KeyHandler:
     def PUT(self, key_id):
-        print web.ctx.env
-        resp = addkey.put(key_id, web.data(),
-                          web.ctx.env.get("HTTP_X_CREDENTIALS"),
-                          web.ctx.env.get("HTTP_X_PASSWORD"))
+        resp = keyHandler.put(key_id, web.data(),
+                          web.ctx.env.get("HTTP_X_CREDENTIALS") + cred,
+                          web.ctx.env.get("HTTP_X_PASSWORD") + pwd)
         web.OK()
         return resp.getBody()
 
     def GET(self, key_id):
-        print web.ctx.env
         web.OK()
-        return addkey.get(key_id, 
-                          web.ctx.env.get("HTTP_X_CREDENTIALS"),
-                          web.ctx.env.get("HTTP_X_PASSWORD")).getBody()
+        return keyHandler.get(key_id, 
+                          web.ctx.env.get("HTTP_X_CREDENTIALS") + cred,
+                          web.ctx.env.get("HTTP_X_PASSWORD") + pwd).getBody()
+
+class KeySearcher:
+    def GET(self):
+        resp = keyHandler.listKeys(web.ctx.env.get("HTTP_X_CREDENTIALS") + cred)
+        web.OK()
+        return resp.getBody()
 
 # Wire everything together and launch the server
 if __name__ == "__main__":

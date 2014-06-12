@@ -71,3 +71,15 @@ http::Response * KeyHandler::get(const std::string & key,
   r->setBody(_storage->get(key, pwd1, pwd2));
   return r;
 }
+
+http::Response * KeyHandler::listKeys(const unsigned char * pwd) {
+  http::Response * r = new http::Response();
+  r->setStatus(200);
+  auto l = _storage->searchKeys("", pwd);
+  std::stringstream ss;
+  for(auto it = l.begin() ; it != l.end() ; ++it) {
+    ss << *it << std::endl;
+  }
+  r->setBody(ss.str());
+  return r;
+}

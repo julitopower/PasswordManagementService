@@ -76,6 +76,7 @@ cdef extern from "KeyHandler.hpp":
         KeyHandler(Storage * const storage)
         Response * put(string key, string jsonValue, unsigned char* pwd1, unsigned char* pwd2)
         Response * get(string key, unsigned char * pwd1, unsigned char * pwd2)
+        Response * listKeys(unsigned char * pwd)
 
 cdef class keyhandler:
     cdef KeyHandler * ptr
@@ -95,6 +96,12 @@ cdef class keyhandler:
     cpdef response get(self, string key, unsigned char * pwd1, unsigned char * pwd2):
         r = response(False)
         cdef Response * resp = self.ptr.get(key, pwd1, pwd2)
+        r.setPtr(resp)
+        return r
+
+    cpdef response listKeys(self, unsigned char * pwd):
+        r = response(False)
+        cdef Response * resp = self.ptr.listKeys(pwd)
         r.setPtr(resp)
         return r
 

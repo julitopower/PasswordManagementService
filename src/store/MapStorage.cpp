@@ -37,12 +37,12 @@ void MapStorage::put(const std::string & key,
 		     const unsigned char * pwd1,
 		     const unsigned char * pwd2) {
   std::vector<char> rawKeyVector(key.begin(), key.end());
-  std::vector<char> keyVector = encrypt(rawKeyVector, pwd1);
+  std::vector<char> encryptedKeyVector = encrypt(rawKeyVector, pwd1);
 
   std::vector<char> rawValueVector(value.begin(), value.end());
-  std::vector<char> valueVector(encrypt(rawValueVector, pwd2));
+  std::vector<char> encryptedValueVector(encrypt(rawValueVector, pwd2));
 
-  (*_map)[keyVector] = valueVector;
+  (*_map)[encryptedKeyVector] = encryptedValueVector;
   _serializer.write(*_map);
 }
 
@@ -56,13 +56,17 @@ std::string MapStorage::get(const std::string & key,
      
      return std::string(valueVector.begin(), valueVector.end());
   }
-  std::cout << "Key " << key << " Not found" << std::endl;
   return "";
 }
 
 std::list<std::string> MapStorage::searchKeys(const std::string &  pattern,
-					      const unsigned char * pwd1) {
+					      const unsigned char * pwd) {
   std::list<std::string> results;
+
+  for(auto it = _map->begin() ; it != _map->end() ; ++it) {
+    std::vector<char> decryptedKey = decrypt(it->first, pwd);
+    results.push_back(std::string(decryptedKey.begin(), decryptedKey.end()));
+  }
   return results;
 }
 

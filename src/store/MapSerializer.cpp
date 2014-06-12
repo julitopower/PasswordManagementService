@@ -37,12 +37,14 @@ namespace storage {
     file.open(FILE_PATH, std::fstream::out | std::fstream::binary);
     for(auto entry = map.begin() ; entry != map.end() ; ++entry) {
       char size = entry->first.size();
+      std::cout << "Size of field: " << size << std::endl;
       file.write(&size, 1);
-      file.write((char *)(&entry->first),(int) size);
+      file.write((char *)(entry->first.data()), (int)size);
       
       size = entry->second.size();
+      std::cout << "Size of field: " << size << std::endl;
       file.write(&size, 1);
-      file.write((char *)(&entry->second), (int)size);
+      file.write((char *)(entry->second.data()), (int)size);
     }
     file.close();
   }
@@ -57,9 +59,11 @@ namespace storage {
     while(!file.eof()) {
       char size;
       file.read(&size,1);
+      if(!file) return map;
+
       std::cout << "Reading Key " << (int)size << std::endl;
       char * key = new char[size];
-      file.read(key,size);
+      file.read(key, size);
       std::vector<char> keyVector(key, key + (int)size);
 
       file.read(&size,1);
